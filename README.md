@@ -27,3 +27,22 @@ Jws<Claims> verify = authServer.verifier().verify(token);
 ```
 
 For complete use, see the test case.
+
+## Why
+
+When I use the Spring Boot framework, I generally follow the following rules to generate tokens.
+
+```json
+{
+  "iss": "auth-app",
+  "iat": 1617156560,
+  "aud": "*",
+  "exp": 1617242960
+}
+```
+
+- iss as the application name `spring.application.name`
+- iat/exp as a basis for time verification
+- aud as authorization target, which may be the target application name or some other identification, such as `user`
+
+I need to create the same tool classes in different Spring Boot every time. So I extracted them.
