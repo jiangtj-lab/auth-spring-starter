@@ -51,7 +51,7 @@ public class JWTBuilder {
         if (applicationName != null) {
             return applicationName.toLowerCase();
         }
-        return null;
+        return "auth";
     }
 
     public JWTBuilder setIssuer(String issuer) {

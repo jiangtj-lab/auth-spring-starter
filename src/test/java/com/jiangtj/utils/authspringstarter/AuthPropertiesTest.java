@@ -11,7 +11,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import javax.annotation.Resource;
 import java.time.Duration;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Created At 2021/3/30.
@@ -39,7 +40,9 @@ class AuthPropertiesTest {
 
         @Test
         void testSpec() {
-            assertNull(properties.getSpec());
+            assertNotNull(properties.getSpec());
+            int size = properties.getSpec().size();
+            assertEquals(0 ,size);
         }
 
         @Test
@@ -67,7 +70,9 @@ class AuthPropertiesTest {
 
         @Test
         void testSpec() {
-            assertNull(properties.getSpec());
+            assertNotNull(properties.getSpec());
+            int size = properties.getSpec().size();
+            assertEquals(0 ,size);
         }
     }
 
@@ -93,7 +98,9 @@ class AuthPropertiesTest {
 
         @Test
         void testSpec() {
-            assertNull(properties.getSpec());
+            assertNotNull(properties.getSpec());
+            int size = properties.getSpec().size();
+            assertEquals(0 ,size);
         }
     }
 

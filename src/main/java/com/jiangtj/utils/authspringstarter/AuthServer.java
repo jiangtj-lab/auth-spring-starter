@@ -2,6 +2,7 @@ package com.jiangtj.utils.authspringstarter;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
+import org.springframework.lang.Nullable;
 
 import javax.annotation.Resource;
 import java.util.Optional;
@@ -22,7 +23,7 @@ public class AuthServer {
         return getOptions(null);
     }
 
-    public Options getOptions(String spec) {
+    public Options getOptions(@Nullable String spec) {
         Options def = properties.getDef();
         Options options = Optional.ofNullable(spec)
                 .map(s -> properties.getSpec().get(s))
@@ -37,7 +38,7 @@ public class AuthServer {
         return verifier(null);
     }
 
-    public JWTVerifier verifier(String spec) {
+    public JWTVerifier verifier(@Nullable String spec) {
         Options options = getOptions(spec);
         return new JWTVerifier(options);
     }
@@ -46,7 +47,7 @@ public class AuthServer {
         return builder(null);
     }
 
-    public JWTBuilder builder(String spec) {
+    public JWTBuilder builder(@Nullable String spec) {
         Options options = getOptions(spec);
         return new JWTBuilder(options, environment);
     }

@@ -4,6 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -14,5 +15,5 @@ import java.util.Map;
 public class AuthProperties {
     @NestedConfigurationProperty
     private Options def = new Options();
-    private Map<String, Options> spec;
+    private Map<String, Options> spec = new HashMap<>();
 }
