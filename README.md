@@ -9,7 +9,7 @@ Auth utils for spring web
 <dependency>
   <groupId>com.jiangtj.utils</groupId>
   <artifactId>auth-spring-starter</artifactId>
-  <version>0.0.2</version>
+  <version>${last-version}</version>
 </dependency>
 ```
 
