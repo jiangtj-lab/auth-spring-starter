@@ -52,7 +52,8 @@ class AuthServerTest {
 
     @Test
     void testBuilder() {
-        authServer.builder("user");
+        String token = authServer.builder("user").build();
+        log.error(token);
     }
 
     @Test
