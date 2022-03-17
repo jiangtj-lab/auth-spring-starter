@@ -17,7 +17,7 @@ public class JWTBuilder {
     private final AuthServer ctx;
     private String issuer;
     private String subject;
-    private String audience = "*";
+    private String audience;
     private Duration expires;
     private final SecretKey key;
     private final String headerPrefix;

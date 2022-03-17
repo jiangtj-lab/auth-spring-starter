@@ -36,7 +36,6 @@ When I use the Spring Boot framework, I generally follow the following rules to 
 {
   "iss": "auth-app",
   "iat": 1617156560,
-  "aud": "*",
   "exp": 1617242960
 }
 ```

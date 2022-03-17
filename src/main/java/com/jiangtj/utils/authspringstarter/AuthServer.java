@@ -38,6 +38,10 @@ public class AuthServer {
         return t;
     }
 
+    public SecretKey getKey() {
+        return getKey(null);
+    }
+
     public SecretKey getKey(@Nullable String spec){
         String secret = getOption(spec, Options::getSecret);
         if (secret == null) {

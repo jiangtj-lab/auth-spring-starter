@@ -12,6 +12,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.annotation.Resource;
+import javax.crypto.SecretKey;
 import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,19 +28,27 @@ class AuthServerTest {
 
     @Resource
     private AuthServer authServer;
-    @Resource
-    private AuthProperties properties;
 
-    /*@Test
+    @Test
     void testGetOptions() {
-        Options options = authServer.getOptions();
-        assertEquals(properties.getDef(), options);
-        Options no = authServer.getOptions("noex");
-        assertEquals(properties.getDef(), no);
-        Options user = authServer.getOptions("user");
-        assertEquals(Duration.ofDays(10), user.getMaxExpires());
-        assertNotNull(user.getRequest());
-    }*/
+        Duration e1 = authServer.getOption("user", Options::getExpires);
+        assertEquals(Duration.ofDays(1), e1);
+        Duration e2 = authServer.getOption("un-exists-key", Options::getExpires);
+        assertEquals(Duration.ofMinutes(5), e2);
+        Duration e3 = authServer.getOption("no-set-name", Options::getExpires);
+        assertEquals(Duration.ofMinutes(5), e3);
+    }
+
+    @Test
+    void testGetKey() {
+        SecretKey k1 = authServer.getKey();
+        SecretKey k2 = authServer.getKey("no-set-name");
+        SecretKey k3 = authServer.getKey("user");
+        SecretKey k4 = authServer.getKey("un-exists-key");
+        assertEquals(k1, k2);
+        assertEquals(k1, k4);
+        assertNotEquals(k1, k3);
+    }
 
     @Test
     void testBuilder() {
