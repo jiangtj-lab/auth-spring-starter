@@ -2,7 +2,6 @@ package com.jiangtj.utils.authspringstarter;
 
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
-import org.springframework.core.env.Environment;
 
 import javax.crypto.SecretKey;
 import java.time.Duration;
@@ -28,7 +27,7 @@ public class JWTBuilder {
         this.ctx = ctx;
         this.issuer = getApplicationName();
         this.expires = ctx.getOption(spec, Options::getExpires);
-        this.key = ctx.getOption(spec, Options::getKey);
+        this.key = ctx.getKey(spec);
         this.headerPrefix = ctx.getOption(spec, Options::getHeaderPrefix);
     }
 

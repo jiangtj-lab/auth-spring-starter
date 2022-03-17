@@ -1,6 +1,5 @@
 package com.jiangtj.utils.authspringstarter;
 
-import io.jsonwebtoken.security.KeyException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -10,7 +9,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.annotation.Resource;
-import javax.crypto.SecretKey;
 import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,11 +40,6 @@ class AuthPropertiesTest {
             int size = properties.getSpec().size();
             assertEquals(0 ,size);
         }
-
-        @Test
-        void testGetKey() {
-            assertThrows(KeyException.class, () -> properties.getDef().getKey());
-        }
     }
 
     @Nested
@@ -70,12 +63,6 @@ class AuthPropertiesTest {
             assertNotNull(properties.getSpec());
             int size = properties.getSpec().size();
             assertEquals(0 ,size);
-        }
-
-        @Test
-        void testGetKey() {
-            SecretKey key = properties.getDef().getKey();
-            assertNotNull(key);
         }
     }
 
@@ -101,8 +88,6 @@ class AuthPropertiesTest {
             assertEquals(Duration.ofDays(10), user.getMaxExpires());
             assertNull(user.getHeaderName());
             assertNull(user.getHeaderPrefix());
-            SecretKey key = user.getKey();
-            assertNotNull(key);
         }
 
         @Test
@@ -113,7 +98,6 @@ class AuthPropertiesTest {
             assertNull(foo.getMaxExpires());
             assertEquals("auth", foo.getHeaderName());
             assertNull(foo.getHeaderPrefix());
-            assertThrows(KeyException.class, foo::getKey);
         }
 
         @Test
@@ -124,7 +108,6 @@ class AuthPropertiesTest {
             assertNull(a.getMaxExpires());
             assertNull(a.getHeaderName());
             assertNull(a.getHeaderPrefix());
-            assertThrows(KeyException.class, a::getKey);
         }
     }
 

@@ -2,11 +2,11 @@ package com.jiangtj.utils.authspringstarter;
 
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Date;
 
 /**
@@ -19,9 +19,9 @@ public class JWTVerifier {
     private final SecretKey key;
     private final String headerPrefix;
 
-    public JWTVerifier(AuthServer ctx, String spec) {
+    public JWTVerifier(AuthServer ctx, @Nullable String spec) {
         this.maxExpires = ctx.getOption(spec, Options::getMaxExpires);
-        this.key = ctx.getOption(spec, Options::getKey);
+        this.key = ctx.getKey(spec);
         this.headerPrefix = ctx.getOption(spec, Options::getHeaderPrefix);
     }
 

@@ -1,12 +1,14 @@
 package com.jiangtj.utils.authspringstarter;
 
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.KeyException;
+import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.lang.Nullable;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.Optional;
+import javax.crypto.SecretKey;
 import java.util.function.Function;
 
 /**
@@ -20,6 +22,7 @@ public class AuthServer {
     @Resource
     private Environment environment;
 
+    @Nullable
     public <T> T getOption(@Nullable String spec, Function<Options, T> fn) {
         if (spec == null) {
             return fn.apply(properties.getDef());
@@ -33,6 +36,15 @@ public class AuthServer {
             return fn.apply(properties.getDef());
         }
         return t;
+    }
+
+    public SecretKey getKey(@Nullable String spec){
+        String secret = getOption(spec, Options::getSecret);
+        if (secret == null) {
+            log.warn("你未设置Key，需要设置auth.def.secret");
+            throw new KeyException("Unknown key!");
+        }
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
     }
 
     public Environment getEnvironment() {
