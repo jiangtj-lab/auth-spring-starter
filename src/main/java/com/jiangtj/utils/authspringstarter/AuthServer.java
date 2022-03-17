@@ -5,7 +5,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.lang.Nullable;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * 2018/9/26.
@@ -18,20 +20,23 @@ public class AuthServer {
     @Resource
     private Environment environment;
 
-
-    public Options getOptions() {
-        return getOptions(null);
+    public <T> T getOption(@Nullable String spec, Function<Options, T> fn) {
+        if (spec == null) {
+            return fn.apply(properties.getDef());
+        }
+        Options options = properties.getSpec().get(spec);
+        if (options == null) {
+            return fn.apply(properties.getDef());
+        }
+        T t = fn.apply(options);
+        if (t == null) {
+            return fn.apply(properties.getDef());
+        }
+        return t;
     }
 
-    public Options getOptions(@Nullable String spec) {
-        Options def = properties.getDef();
-        Options options = Optional.ofNullable(spec)
-                .map(s -> properties.getSpec().get(s))
-                .orElse(def);
-        if (options.getSecret() == null) {
-            options.setSecret(def.getSecret());
-        }
-        return options;
+    public Environment getEnvironment() {
+        return environment;
     }
 
     public JWTVerifier verifier() {
@@ -39,8 +44,7 @@ public class AuthServer {
     }
 
     public JWTVerifier verifier(@Nullable String spec) {
-        Options options = getOptions(spec);
-        return new JWTVerifier(options);
+        return new JWTVerifier(this, spec);
     }
 
     public JWTBuilder builder() {
@@ -48,7 +52,6 @@ public class AuthServer {
     }
 
     public JWTBuilder builder(@Nullable String spec) {
-        Options options = getOptions(spec);
-        return new JWTBuilder(options, environment);
+        return new JWTBuilder(this, spec);
     }
 }

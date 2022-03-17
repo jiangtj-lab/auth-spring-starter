@@ -4,6 +4,7 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import org.springframework.core.env.Environment;
 
+import javax.crypto.SecretKey;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
@@ -14,40 +15,42 @@ import java.util.function.Function;
  */
 public class JWTBuilder {
 
-    private final Options options;
-    private final Environment environment;
+    private final AuthServer ctx;
     private String issuer;
     private String subject;
     private String audience = "*";
     private Duration expires;
+    private final SecretKey key;
+    private final String headerPrefix;
     private Function<JwtBuilder, JwtBuilder> extend;
 
-    public JWTBuilder(Options options, Environment environment) {
-        this.options = options;
-        this.environment = environment;
+    public JWTBuilder(AuthServer ctx, String spec) {
+        this.ctx = ctx;
         this.issuer = getApplicationName();
-        this.expires = options.getExpires();
+        this.expires = ctx.getOption(spec, Options::getExpires);
+        this.key = ctx.getOption(spec, Options::getKey);
+        this.headerPrefix = ctx.getOption(spec, Options::getHeaderPrefix);
     }
 
     public String build() {
         JwtBuilder builder = Jwts.builder()
-                .signWith(options.getKey())
-                .setIssuer(issuer)
-                .setSubject(subject)
-                .setIssuedAt(new Date())
-                .setAudience(audience)
-                .setExpiration(Date.from(Instant.now().plusSeconds(expires.getSeconds())));
+            .signWith(key)
+            .setIssuer(issuer)
+            .setSubject(subject)
+            .setIssuedAt(new Date())
+            .setAudience(audience)
+            .setExpiration(Date.from(Instant.now().plusSeconds(expires.getSeconds())));
 
         if (extend != null) {
             builder = extend.apply(builder);
         }
 
         String compact = builder.compact();
-        return options.getRequest().getHeaderPrefix() + compact;
+        return headerPrefix + compact;
     }
 
     private String getApplicationName() {
-        String applicationName = environment.getProperty("spring.application.name");
+        String applicationName = ctx.getEnvironment().getProperty("spring.application.name");
         if (applicationName != null) {
             return applicationName.toLowerCase();
         }

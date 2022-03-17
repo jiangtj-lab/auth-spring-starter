@@ -4,6 +4,7 @@ import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
+import javax.crypto.SecretKey;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
@@ -14,16 +15,20 @@ import java.util.Date;
 @Slf4j
 public class JWTVerifier {
 
-    private final Options options;
+    private final Duration maxExpires;
+    private final SecretKey key;
+    private final String headerPrefix;
 
-    public JWTVerifier(Options options) {
-        this.options = options;
+    public JWTVerifier(AuthServer ctx, String spec) {
+        this.maxExpires = ctx.getOption(spec, Options::getMaxExpires);
+        this.key = ctx.getOption(spec, Options::getKey);
+        this.headerPrefix = ctx.getOption(spec, Options::getHeaderPrefix);
     }
 
     public Jws<Claims> verify(String token) {
         token = verifyRequest(token);
         JwtParser parser = Jwts.parserBuilder()
-                .setSigningKey(options.getKey())
+                .setSigningKey(key)
                 .build();
         Jws<Claims> claims = parser.parseClaimsJws(token);
         verifyTime(claims.getBody());
@@ -35,12 +40,11 @@ public class JWTVerifier {
             log.warn("Token is empty!");
             throw new UnsupportedJwtException("Token is empty!");
         }
-        String prefix = options.getRequest().getHeaderPrefix();
-        if (!token.startsWith(prefix)) {
-            log.warn("Don't have prefix {}!", prefix);
+        if (!token.startsWith(headerPrefix)) {
+            log.warn("Don't have prefix {}!", headerPrefix);
             throw new UnsupportedJwtException("Unsupported authu jwt token!");
         }
-        return token.substring(prefix.length());
+        return token.substring(headerPrefix.length());
     }
 
     public void verifyTime(Claims body) {
@@ -50,12 +54,8 @@ public class JWTVerifier {
             log.warn("IssuedAt or Expiration is empty!");
             throw new RequiredTypeException("IssuedAt or Expiration is empty!");
         }
-        if (expiration.toInstant().isBefore(Instant.now())) {
-            log.warn("Token is expired!");
-            throw new ExpiredJwtException(null, body, "Token is expired!");
-        }
         Duration timeout = Duration.between(issuedAt.toInstant(), expiration.toInstant());
-        if (timeout.compareTo(options.getMaxExpires()) > 0) {
+        if (timeout.compareTo(maxExpires) > 0) {
             log.warn("Timeout is bigger than max expires time!");
             throw new ExpiredJwtException(null, body, "ExpiresTime is bigger than max expires time!");
         }

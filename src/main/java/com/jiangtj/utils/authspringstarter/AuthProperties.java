@@ -14,6 +14,6 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "auth")
 public class AuthProperties {
     @NestedConfigurationProperty
-    private Options def = new Options();
+    private Options def = Options.def();
     private Map<String, Options> spec = new HashMap<>();
 }

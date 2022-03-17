@@ -1,5 +1,6 @@
 package com.jiangtj.utils.authspringstarter;
 
+import io.jsonwebtoken.security.KeyException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -9,10 +10,10 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.annotation.Resource;
+import javax.crypto.SecretKey;
 import java.time.Duration;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created At 2021/3/30.
@@ -21,8 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = AuthConfiguration.class)
 class AuthPropertiesTest {
-
-    private final Options defaultOptions = new Options();
 
     @Nested
     class DefaultEnv {
@@ -34,12 +33,11 @@ class AuthPropertiesTest {
         void testOptions() {
             Options def = properties.getDef();
             assertNotNull(def);
-            assertNotNull(def.getRequest());
-            assertEquals(defaultOptions.getSecret(), def.getSecret());
-        }
-
-        @Test
-        void testSpec() {
+            assertNull(def.getSecret());
+            assertEquals(Duration.ofMinutes(5), def.getExpires());
+            assertEquals(Duration.ofMinutes(30), def.getMaxExpires());
+            assertEquals("Authorization", def.getHeaderName());
+            assertEquals("Bearer ", def.getHeaderPrefix());
             assertNotNull(properties.getSpec());
             int size = properties.getSpec().size();
             assertEquals(0 ,size);
@@ -47,13 +45,13 @@ class AuthPropertiesTest {
 
         @Test
         void testGetKey() {
-            properties.getDef().getKey();
+            assertThrows(KeyException.class, () -> properties.getDef().getKey());
         }
     }
 
     @Nested
     @TestPropertySource(properties = {
-            "auth.def.secret=newval",
+        "auth.def.secret=vtsjytbfgdfsrgsgtrhrseveewvtsrbrwevc2evtsresgerfcwedefrebtrtred",
     })
     class CustomKey {
 
@@ -64,52 +62,31 @@ class AuthPropertiesTest {
         void testOptions() {
             Options def = properties.getDef();
             assertNotNull(def);
-            assertNotNull(def.getRequest());
-            assertEquals("newval", def.getSecret());
-        }
-
-        @Test
-        void testSpec() {
+            assertEquals("vtsjytbfgdfsrgsgtrhrseveewvtsrbrwevc2evtsresgerfcwedefrebtrtred", def.getSecret());
+            assertEquals(Duration.ofMinutes(5), def.getExpires());
+            assertEquals(Duration.ofMinutes(30), def.getMaxExpires());
+            assertEquals("Authorization", def.getHeaderName());
+            assertEquals("Bearer ", def.getHeaderPrefix());
             assertNotNull(properties.getSpec());
             int size = properties.getSpec().size();
             assertEquals(0 ,size);
+        }
+
+        @Test
+        void testGetKey() {
+            SecretKey key = properties.getDef().getKey();
+            assertNotNull(key);
         }
     }
 
     @Nested
     @TestPropertySource(properties = {
-            "auth.def.request.header-name=auth",
-    })
-    class CustomRequest {
-
-        @Resource
-        private AuthProperties properties;
-
-        @Test
-        void testOptions() {
-            Options def = properties.getDef();
-            assertNotNull(def);
-            assertEquals(defaultOptions.getSecret(), def.getSecret());
-            Options.Request request = def.getRequest();
-            assertNotNull(request);
-            assertEquals("auth", request.getHeaderName());
-            assertEquals(defaultOptions.getRequest().getHeaderPrefix(), request.getHeaderPrefix());
-        }
-
-        @Test
-        void testSpec() {
-            assertNotNull(properties.getSpec());
-            int size = properties.getSpec().size();
-            assertEquals(0 ,size);
-        }
-    }
-
-    @Nested
-    @TestPropertySource(properties = {
-            "auth.spec.user.expires=1d",
-            "auth.spec.user.max-expires=10d",
-            "auth.spec.foo.request.header-name=auth",
-            "auth.spec.a.secret=newval",
+        "auth.def.secret=unuse",
+        "auth.spec.user.secret=vtsjytbfgdfsrgsgtrhrseveedswvtsrbrwevc2evtsresgerfcdefrebtrtred",
+        "auth.spec.user.expires=1d",
+        "auth.spec.user.max-expires=10d",
+        "auth.spec.foo.header-name=auth",
+        "auth.spec.a.secret=newval",
     })
     class SpecTest {
 
@@ -119,37 +96,35 @@ class AuthPropertiesTest {
         @Test
         void testUser() {
             Options user = properties.getSpec().get("user");
-            assertEquals(defaultOptions.getSecret(), user.getSecret());
+            assertEquals("vtsjytbfgdfsrgsgtrhrseveedswvtsrbrwevc2evtsresgerfcdefrebtrtred", user.getSecret());
             assertEquals(Duration.ofDays(1), user.getExpires());
             assertEquals(Duration.ofDays(10), user.getMaxExpires());
-            Options.Request request = user.getRequest();
-            assertNotNull(request);
-            assertEquals(defaultOptions.getRequest().getHeaderName(), request.getHeaderName());
-            assertEquals(defaultOptions.getRequest().getHeaderPrefix(), request.getHeaderPrefix());
+            assertNull(user.getHeaderName());
+            assertNull(user.getHeaderPrefix());
+            SecretKey key = user.getKey();
+            assertNotNull(key);
         }
 
         @Test
         void testFoo() {
             Options foo = properties.getSpec().get("foo");
-            assertEquals(defaultOptions.getSecret(), foo.getSecret());
-            assertEquals(defaultOptions.getExpires(), foo.getExpires());
-            assertEquals(defaultOptions.getMaxExpires(), foo.getMaxExpires());
-            Options.Request request = foo.getRequest();
-            assertNotNull(request);
-            assertEquals("auth", request.getHeaderName());
-            assertEquals(defaultOptions.getRequest().getHeaderPrefix(), request.getHeaderPrefix());
+            assertNull(foo.getSecret());
+            assertNull(foo.getExpires());
+            assertNull(foo.getMaxExpires());
+            assertEquals("auth", foo.getHeaderName());
+            assertNull(foo.getHeaderPrefix());
+            assertThrows(KeyException.class, foo::getKey);
         }
 
         @Test
         void testA() {
             Options a = properties.getSpec().get("a");
             assertEquals("newval", a.getSecret());
-            assertEquals(defaultOptions.getExpires(), a.getExpires());
-            assertEquals(defaultOptions.getMaxExpires(), a.getMaxExpires());
-            Options.Request request = a.getRequest();
-            assertNotNull(request);
-            assertEquals(defaultOptions.getRequest().getHeaderName(), request.getHeaderName());
-            assertEquals(defaultOptions.getRequest().getHeaderPrefix(), request.getHeaderPrefix());
+            assertNull(a.getExpires());
+            assertNull(a.getMaxExpires());
+            assertNull(a.getHeaderName());
+            assertNull(a.getHeaderPrefix());
+            assertThrows(KeyException.class, a::getKey);
         }
     }
 

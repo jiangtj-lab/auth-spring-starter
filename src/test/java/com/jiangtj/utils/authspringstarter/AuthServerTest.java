@@ -13,8 +13,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.annotation.Resource;
 import java.time.Duration;
-import java.time.Instant;
-import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,7 +30,7 @@ class AuthServerTest {
     @Resource
     private AuthProperties properties;
 
-    @Test
+    /*@Test
     void testGetOptions() {
         Options options = authServer.getOptions();
         assertEquals(properties.getDef(), options);
@@ -41,7 +39,7 @@ class AuthServerTest {
         Options user = authServer.getOptions("user");
         assertEquals(Duration.ofDays(10), user.getMaxExpires());
         assertNotNull(user.getRequest());
-    }
+    }*/
 
     @Test
     void testBuilder() {
@@ -68,10 +66,7 @@ class AuthServerTest {
         });
 
         assertThrows(ExpiredJwtException.class, () -> {
-            Claims claims = Jwts.claims();
-            claims.setIssuedAt(Date.from(Instant.now().minusSeconds(200)));
-            claims.setExpiration(Date.from(Instant.now().minusSeconds(100)));
-            verifier.verifyTime(claims);
+            authServer.verifier("user").verify("Bearer eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhdXRoIiwiaWF0IjoxNjQ3NDg1MjQ4LCJhdWQiOiIqIiwiZXhwIjoxNjQ3NDg1MjQ5fQ.zLyz2oY2t5GEl5MwsfFUu4R_decWxJXO7pLlfSm6VAI");
         });
     }
 

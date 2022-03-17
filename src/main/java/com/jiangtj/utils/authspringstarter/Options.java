@@ -2,6 +2,7 @@ package com.jiangtj.utils.authspringstarter;
 
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.KeyException;
 import io.jsonwebtoken.security.Keys;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -18,23 +19,25 @@ import java.time.Duration;
 public class Options {
 
     private String secret;
-    private Duration expires = Duration.ofMinutes(5);
-    private Duration maxExpires = Duration.ofMinutes(30);
-    @NestedConfigurationProperty
-    private Request request = new Request();
-
-    @Data
-    static public class Request {
-        private String headerName = "Authorization";
-        private String headerPrefix = "Bearer ";
-    }
+    private Duration expires;
+    private Duration maxExpires;
+    private String headerName;
+    private String headerPrefix;
 
     public SecretKey getKey(){
         if (this.secret == null) {
-            SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
             log.warn("你未设置Key，需要设置auth.def.secret");
-            return secretKey;
+            throw new KeyException("Unknown key!");
         }
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(this.secret));
+    }
+
+    public static Options def(){
+        Options options = new Options();
+        options.setExpires(Duration.ofMinutes(5));
+        options.setMaxExpires(Duration.ofMinutes(30));
+        options.setHeaderName("Authorization");
+        options.setHeaderPrefix("Bearer ");
+        return options;
     }
 }
