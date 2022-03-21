@@ -23,6 +23,11 @@ public class AuthServer {
     private Environment environment;
 
     @Nullable
+    public <T> T getOption(Function<Options, T> fn) {
+        return fn.apply(properties.getDef());
+    }
+
+    @Nullable
     public <T> T getOption(@Nullable String spec, Function<Options, T> fn) {
         if (spec == null) {
             return fn.apply(properties.getDef());

@@ -31,6 +31,8 @@ class AuthServerTest {
 
     @Test
     void testGetOptions() {
+        Duration d1 = authServer.getOption(Options::getExpires);
+        assertEquals(Duration.ofMinutes(5), d1);
         Duration e1 = authServer.getOption("user", Options::getExpires);
         assertEquals(Duration.ofDays(1), e1);
         Duration e2 = authServer.getOption("un-exists-key", Options::getExpires);
