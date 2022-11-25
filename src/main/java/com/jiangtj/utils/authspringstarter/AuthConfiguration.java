@@ -1,13 +1,13 @@
 package com.jiangtj.utils.authspringstarter;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * Created At 2021/3/24.
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @EnableConfigurationProperties(AuthProperties.class)
 public class AuthConfiguration {
 

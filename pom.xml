@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.jiangtj.utils</groupId>
     <artifactId>auth-spring-starter</artifactId>
-    <version>0.2.1</version>
+    <version>0.2.2</version>
     <name>auth-spring-starter</name>
     <description>Auth utils</description>
     <properties>
