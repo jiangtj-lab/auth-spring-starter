@@ -3,11 +3,11 @@ package com.jiangtj.utils.authspringstarter;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.KeyException;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.lang.Nullable;
 
-import javax.annotation.Resource;
 import javax.crypto.SecretKey;
 import java.util.function.Function;
 

@@ -5,17 +5,17 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.4</version>
+        <version>3.0.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.jiangtj.utils</groupId>
     <artifactId>auth-spring-starter</artifactId>
-    <version>0.1.2</version>
+    <version>0.2.0</version>
     <name>auth-spring-starter</name>
     <description>Auth utils</description>
     <properties>
-        <java.version>8</java.version>
-        <jjwt.version>0.11.2</jjwt.version>
+        <java.version>17</java.version>
+        <jjwt.version>0.11.5</jjwt.version>
     </properties>
     <dependencies>
         <dependency>
